@@ -1,21 +1,21 @@
 name: auto-build and upload to tencent COS
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # 修改这里来手动触发工作流
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout master
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2  # 更新到 v2 版本
       - name: Setup Node
-        uses: actions/setup-node@master
+        uses: actions/setup-node@v3  # 使用最新稳定版本
+        with:
+          node-version: '16'  # 明确指定 Node.js 版本
         
       - name: Install & Build
-        run:  |
+        run: |
             npm install
             npm run build
         
@@ -30,10 +30,10 @@ jobs:
           pip install coscmd
           echo "Sync to tencent cos..."
           cd dist
-          coscmd config -a ${{ secrets.SECRET_ID }} -s ${{ secrets.SECRET_KEY }} -b ${{ secrets.BUCKET }} -e cos.accelerate.myqcloud.com -m 30
+          coscmd config -a ${{ secrets.SECRET_ID }} -s ${{ secrets.SECRET_KEY }} -b ${{ secrets.BUCKET }} -r cos.accelerate.myqcloud.com -m 30
           coscmd upload -rs ./ / --ignore "./.git/*","./.github/*","./README.md"
-          coscmd abort
           echo "Delete old files..."
           curl https://raw.githubusercontent.com/ljxi/Sync-to-tencent-cos/main/Delete-old-files.py -o ./Delete-old-files.py
           python Delete-old-files.py
           echo "Sync to tencent cos done!"
+
