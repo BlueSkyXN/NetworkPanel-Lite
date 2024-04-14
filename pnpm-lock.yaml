@@ -65,7 +65,7 @@ devDependencies:
     specifier: ^0.25.2
     version: 0.25.2(rollup@2.79.1)(vue@3.4.21)
   vite:
-    specifier: ^4.4.9
+    specifier: ^4.5.3
     version: 4.5.3(@types/node@18.19.31)(sass@1.75.0)(terser@5.30.3)
   vite-plugin-cdn-import:
     specifier: ^0.3.5
