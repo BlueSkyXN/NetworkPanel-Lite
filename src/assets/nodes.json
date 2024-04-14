@@ -1,0 +1,20 @@
+{
+	"运营商":{
+		"咪咕快游[高速]":"https://freeserver.migufun.com/resource/beta/apk/20231114094513/MiguPlay-V3.69.1.1_miguzsj.apk",
+		"咪咕音乐":"https://d.musicapp.migu.cn/upload/fbpt_rsync_apps/local/signed/MobileMusic7413/MobileMusic7413_014000D.apk",
+		"咪咕视频":"https://img.cmvideo.cn/publish/noms/2023/12/06/1O4SHFIFR36BD.gif",
+		"咪咕快游2":"https://h5cdn.migufun.com/middleh5/_nuxt/643447d.js",
+		"量子密信":"https://im.zdxlz.com/downloadmi/file-im-sdk/apk/mobile/%E9%87%8F%E5%AD%90%E5%AF%86%E4%BF%A1.apk",
+		"和彩云":"https://img.mcloud.139.com/material_prod/material_media/20221128/1669626861087.png",
+		"电信测速":"https://vipspeedtest8.wuhan.net.cn:8080/download?size=1073741824"
+	},
+	"全球[Global]":{
+		"Cachefly":"https://web1.cachefly.net/speedtest/downloading",
+		"Cloudflare":"https://speed.cloudflare.com/__down?bytes=104857600",
+		"jsDelivr":"https://cdn.jsdelivr.net/gh/ljxi/CDN-IP-test@main/dump",
+		"Cloudflare Workers":"https://gh.con.sh/https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/Waifu2x-Extension-GUI-v2.21.12-Portable.7z",
+		"Steam Akamai":"https://cdn.akamai.steamstatic.com/steam/apps/1063730/extras/NW_Sword_Sorcery_2.gif",
+		"Steam Cloudflare":"https://cdn.cloudflare.steamstatic.com/steam/apps/1063730/extras/NW_Sword_Sorcery_2.gif",
+		"Microsoft Akamai":"https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RW16Ptm"
+	}
+}
