@@ -1,12 +1,12 @@
 {
-	"运营商":{
-		"咪咕快游[高速]":"https://freeserver.migufun.com/resource/beta/apk/20231114094513/MiguPlay-V3.69.1.1_miguzsj.apk",
-		"咪咕音乐":"https://d.musicapp.migu.cn/upload/fbpt_rsync_apps/local/signed/MobileMusic7413/MobileMusic7413_014000D.apk",
-		"咪咕视频":"https://img.cmvideo.cn/publish/noms/2023/12/06/1O4SHFIFR36BD.gif",
-		"咪咕快游2":"https://h5cdn.migufun.com/middleh5/_nuxt/643447d.js",
-		"量子密信":"https://im.zdxlz.com/downloadmi/file-im-sdk/apk/mobile/%E9%87%8F%E5%AD%90%E5%AF%86%E4%BF%A1.apk",
-		"和彩云":"https://img.mcloud.139.com/material_prod/material_media/20221128/1669626861087.png",
-		"电信测速":"https://vipspeedtest8.wuhan.net.cn:8080/download?size=1073741824"
+	"中国大陆[CN]":{
+		"Acfun安卓版安装包[高速]":"https://cdn.aixifan.com/downloads/AcFun-acfunh5-release-6.62.0.1238_x64_60b608.apk",
+		"UC[高速]":"https://image.uc.cn/s/uae/g/3o/broccoli/resource/202401/zry_video.mp4",
+		"123网盘安装包EXE":"https://app.123pan.com/pc-pro/windows/218/123pan_2.1.8.exe",
+		"联通云":"https://www.cucloud.cn/templets/1/default/images/nodes-overview-bg.png",
+		"腾讯云":"https://cosbrowser-1253960454.cos.ap-shanghai.myqcloud.com/releases/cosbrowser-setup-2.11.23.exe",
+		"VIVO":"https://wwwstatic.vivo.com.cn/vivoportal/files/resource/funtouch/1651200648928/images/os2-jude-video.mp4",
+		"上海灵羊":"https://activity.hdslb.com/blackboard/static/20210604/4d40bc4f98f94fbc71c235832ce3efd4/hJEhL6jGOY.zip"
 	},
 	"全球[Global]":{
 		"Cachefly":"https://web1.cachefly.net/speedtest/downloading",
