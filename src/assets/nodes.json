@@ -6,7 +6,9 @@
 		"联通云":"https://www.cucloud.cn/templets/1/default/images/nodes-overview-bg.png",
 		"腾讯云":"https://cosbrowser-1253960454.cos.ap-shanghai.myqcloud.com/releases/cosbrowser-setup-2.11.23.exe",
 		"VIVO":"https://wwwstatic.vivo.com.cn/vivoportal/files/resource/funtouch/1651200648928/images/os2-jude-video.mp4",
-		"上海灵羊":"https://activity.hdslb.com/blackboard/static/20210604/4d40bc4f98f94fbc71c235832ce3efd4/hJEhL6jGOY.zip"
+		"上海灵羊":"https://activity.hdslb.com/blackboard/static/20210604/4d40bc4f98f94fbc71c235832ce3efd4/hJEhL6jGOY.zip",
+		"咪蛤油布丁":"https://autopatchcn.yuanshen.com/client_app/update/hk4e_cn/audio_zh-cn_4.7.0_5.0.0_hdiff_cEouBwfybWNuhcWP.zip",
+		"咪鱿舍CDN":"https://upload-bbs.miyoushe.com/upload/2024/10/25/288909600/9979574bd093f12275039c7a4c4b15fe_6624839044782863074.jpg"
 	},
 	"全球[Global]":{
 		"Cachefly":"https://web1.cachefly.net/speedtest/downloading",
@@ -15,6 +17,7 @@
 		"Cloudflare Workers":"https://gh.con.sh/https://github.com/AaronFeng753/Waifu2x-Extension-GUI/releases/download/v2.21.12/Waifu2x-Extension-GUI-v2.21.12-Portable.7z",
 		"Steam Akamai":"https://cdn.akamai.steamstatic.com/steam/apps/1063730/extras/NW_Sword_Sorcery_2.gif",
 		"Steam Cloudflare":"https://cdn.cloudflare.steamstatic.com/steam/apps/1063730/extras/NW_Sword_Sorcery_2.gif",
-		"Microsoft Akamai":"https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RW16Ptm"
+		"Microsoft Akamai":"https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RW16Ptm",
+		"Racknerd LAX [CORS]":"https://lg-lax02.racknerd.com/test_files/1GB.test"
 	}
 }
