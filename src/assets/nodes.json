@@ -1,14 +1,18 @@
 {
 	"中国大陆[CN]":{
-		"Acfun安卓版安装包[高速]":"https://cdn.aixifan.com/downloads/AcFun-acfunh5-release-6.62.0.1238_x64_60b608.apk",
-		"UC[高速]":"https://image.uc.cn/s/uae/g/3o/broccoli/resource/202401/zry_video.mp4",
-		"123网盘安装包EXE":"https://app.123pan.com/pc-pro/windows/218/123pan_2.1.8.exe",
+		"Acfun安卓版安装包":"https://cdn.aixifan.com/downloads/AcFun-acfunh5-release-6.77.0.1305_x64_e22a56.apk",
+		"UC":"https://image.uc.cn/s/uae/g/3o/broccoli/resource/202401/zry_video.mp4",
+		"和彩云":"https://img.mcloud.139.com/material_prod/material_media/20221128/1669626861087.png",
+		"天翼云桌面":"https://desk.ctyun.cn:8999/desktop-prod/software/windows_tob_client/15/64/202030001/CtyunClouddeskUniversal_2.3.0_202030001_x86_20240327104015_Setup.exe",
+		"腾讯云":"https://cos5.cloud.tencent.com/cosbrowser/cosbrowser-setup-latest.exe",
 		"联通云":"https://www.cucloud.cn/templets/1/default/images/nodes-overview-bg.png",
-		"腾讯云":"https://cosbrowser-1253960454.cos.ap-shanghai.myqcloud.com/releases/cosbrowser-setup-2.11.23.exe",
+		"咪咕视频":"https://img.cmvideo.cn/publish/noms/2023/12/06/1O4SHFIFR36BD.gif",
 		"VIVO":"https://wwwstatic.vivo.com.cn/vivoportal/files/resource/funtouch/1651200648928/images/os2-jude-video.mp4",
 		"上海灵羊":"https://activity.hdslb.com/blackboard/static/20210604/4d40bc4f98f94fbc71c235832ce3efd4/hJEhL6jGOY.zip",
-		"咪蛤油布丁":"https://autopatchcn.yuanshen.com/client_app/update/hk4e_cn/audio_zh-cn_4.7.0_5.0.0_hdiff_cEouBwfybWNuhcWP.zip",
-		"咪鱿舍CDN":"https://upload-bbs.miyoushe.com/upload/2024/10/25/288909600/9979574bd093f12275039c7a4c4b15fe_6624839044782863074.jpg"
+		"咪鱿舍CDN":"https://upload-bbs.miyoushe.com/upload/2024/10/25/288909600/9979574bd093f12275039c7a4c4b15fe_6624839044782863074.jpg",
+		"咪蛤油布丁-CORS":"https://autopatchcn.yuanshen.com/client_app/update/hk4e_cn/audio_zh-cn_4.7.0_5.0.0_hdiff_cEouBwfybWNuhcWP.zip",
+		"123网盘安装包EXE-CORS":"https://app.123pan.com/pc-pro/windows/218/123pan_2.1.8.exe",
+		"联通云盘-CORS":"https://pan.wo.cn/img/login-bg1.e55e7805.png"
 	},
 	"全球[Global]":{
 		"Cachefly":"https://web1.cachefly.net/speedtest/downloading",
