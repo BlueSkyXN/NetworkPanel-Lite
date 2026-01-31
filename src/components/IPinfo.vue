@@ -41,15 +41,25 @@ const info=reactive({
     localLay:0,
     globalLay:0,
 })
-const ip_cache=reactive(JSON.parse(localStorage.getItem("ip_cache")||"{}"))
+// Fix: Add try-catch for JSON.parse to prevent crashes from corrupted localStorage
+let parsedIpCache: Record<string, any> = {}
+try {
+  const cacheData = localStorage.getItem("ip_cache")
+  if (cacheData) {
+    parsedIpCache = JSON.parse(cacheData)
+  }
+} catch (err) {
+  console.warn('Failed to parse ip_cache from localStorage:', err)
+  localStorage.removeItem("ip_cache")
+}
+const ip_cache=reactive(parsedIpCache)
 watchEffect(()=>{
     localStorage.setItem("ip_cache",JSON.stringify(ip_cache))
 })
 const copy=(ip:string)=>{
     toClipboard(ip)
     ElMessage.success({
-        dangerouslyUseHTMLString: true,
-        message: `已经复制IP地址：<br><strong>${ip}</strong>`,
+        message: `已经复制IP地址：${ip}`,
     })
 }
 
