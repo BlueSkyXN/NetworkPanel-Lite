@@ -249,8 +249,7 @@ const open = (url:string) => {
 let copyText = (txt:string) => {
   toClipboard(txt)
   ElMessage.info({
-    dangerouslyUseHTMLString: true,
-    message: '<center>已经复制到剪切板</center>',
+    message: '已经复制到剪切板',
   })
 }
 document.addEventListener("visibilitychange", function () {

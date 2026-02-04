@@ -258,7 +258,18 @@ import { toClipboard } from '@soerenmartius/vue3-clipboard'
 import FullScreenUI from './FullScreen.vue'
 
 // const showMark = ref({ show: false })
-const customNodes = reactive(localStorage.customNodes ? JSON.parse(localStorage.customNodes) : [])
+// Fix: Add try-catch for JSON.parse to prevent crashes from corrupted localStorage
+let parsedCustomNodes: any[] = []
+try {
+  if (localStorage.customNodes) {
+    parsedCustomNodes = JSON.parse(localStorage.customNodes)
+  }
+} catch (err) {
+  console.warn('Failed to parse customNodes from localStorage:', err)
+  // Clear corrupted data
+  delete localStorage.customNodes
+}
+const customNodes = reactive(parsedCustomNodes)
 const OnlineNodes: {
   label: string;
   options: {
@@ -351,7 +362,6 @@ const tryStart = async () => {
   state.isChecking = false
   if (!urlStatus.status) {
     ElMessage.error({
-      dangerouslyUseHTMLString: true,
       message: urlStatus.info
     })
   } else {
@@ -370,13 +380,19 @@ const checkUrl = async (url: string) => {
 
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 5000);
-    const response = await fetch(url, { cache: "no-store", mode: 'cors', referrerPolicy: 'no-referrer' ,signal: controller.signal})
-    if (response.status == 404) throw "资源响应异常" + response.status
-    if (!response.body) throw "资源响应异常 Nobody"
-    const reader = response.body.getReader();
-    const { value, done } = await reader.read();
-    if (!value || value.length <= 0) throw "资源响应异常 Nobody";
-    reader.cancel()
+    try {
+      const response = await fetch(url, { cache: "no-store", mode: 'cors', referrerPolicy: 'no-referrer' ,signal: controller.signal})
+      clearTimeout(id) // Fix: Clear timeout on success
+      if (response.status == 404) throw "资源响应异常" + response.status
+      if (!response.body) throw "资源响应异常 Nobody"
+      const reader = response.body.getReader();
+      const { value, done } = await reader.read();
+      if (!value || value.length <= 0) throw "资源响应异常 Nobody";
+      reader.cancel()
+    } catch (fetchErr) {
+      clearTimeout(id) // Fix: Clear timeout on error
+      throw fetchErr
+    }
   } catch (err) {
     status = false
     if (err instanceof Error) info = err.message
@@ -514,7 +530,6 @@ watchEffect(() => {
 const copyUrl = () => {
   toClipboard(runUrl.value).then(() => {
     ElMessage.success({
-      dangerouslyUseHTMLString: true,
       message: '已复制当前链接',
     })
   })
@@ -617,9 +632,14 @@ const speedCtr=()=>{
       },1000-(new Date().getTime()%1000))
     })
   }
+  // Fix: Always return a resolved promise
+  return Promise.resolve()
 }
 
-async function startThread(index: number) {
+async function startThread(index: number, retryCount: number = 0) {
+  const MAX_RETRIES = 5
+  const RETRY_DELAY = Math.min(1000 * Math.pow(2, retryCount), 10000) // Exponential backoff, max 10s
+  
   try {
     if(solvedRunUrl==""){
       isRunning.value=false
@@ -633,28 +653,39 @@ async function startThread(index: number) {
     if (contentLength) realLength = parseInt(contentLength)
     const reader = response.body.getReader();
     let decodeLength = 0
-    while (true) {
-      if(state.maxSpeed)await speedCtr()
-      const { value } = await reader.read();
-      let chunkLength = value?.length
-      if (!chunkLength || solvedRunUrl != _url) {
-        startThread(index);
-        break;
+    try {
+      while (true) {
+        if(state.maxSpeed)await speedCtr()
+        const { value } = await reader.read();
+        let chunkLength = value?.length
+        if (!chunkLength || solvedRunUrl != _url) {
+          // Fix: Cancel reader before recursive call to prevent resource leak
+          await reader.cancel()
+          startThread(index, 0); // Reset retry count on URL change
+          return; // Use return instead of break to avoid duplicate cancel
+        }
+        let usefulChunkLength = chunkLength
+        if (decodeLength >= realLength) {
+          usefulChunkLength = 0
+        } else if (decodeLength + chunkLength > realLength) {
+          usefulChunkLength = realLength - decodeLength
+        }
+        state.bytesUsed += usefulChunkLength
+        if (index >= threadNum.value || !isRunning.value) break
+        decodeLength += chunkLength
       }
-      let usefulChunkLength = chunkLength
-      if (decodeLength >= realLength) {
-        usefulChunkLength = 0
-      } else if (decodeLength + chunkLength > realLength) {
-        usefulChunkLength = realLength - decodeLength
-      }
-      state.bytesUsed += usefulChunkLength
-      if (index >= threadNum.value || !isRunning.value) break
-      decodeLength += chunkLength
+    } finally {
+      // Fix: Ensure reader is always cancelled
+      await reader.cancel()
     }
-    reader.cancel()
   } catch (err) {
     console.log(err)
-    if (isRunning.value) startThread(index);
+    // Fix: Implement exponential backoff and retry limit to prevent infinite recursion
+    if (isRunning.value && retryCount < MAX_RETRIES) {
+      setTimeout(() => startThread(index, retryCount + 1), RETRY_DELAY)
+    } else if (retryCount >= MAX_RETRIES) {
+      console.warn(`Thread ${index} exceeded max retries (${MAX_RETRIES})`)
+    }
   }
 }
 
@@ -678,7 +709,6 @@ const addNode = async () => {
   if (!urlStatus.status) {
     addForm.value.checking = false
     ElMessage.error({
-      dangerouslyUseHTMLString: true,
       message: urlStatus.info,
     })
     return
