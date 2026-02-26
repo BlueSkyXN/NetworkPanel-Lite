@@ -32,7 +32,7 @@ const props = defineProps({
     isVisible: Boolean
 })
 import CountryCode from "../assets/CountryCode.json"
-import { reactive,watchEffect } from 'vue'
+import { reactive,watchEffect,onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
 const info=reactive({
@@ -88,14 +88,14 @@ async function fv() {
         }
         return localInfo
     } catch (error) {
-        throw "获取本地IP失败"
+        throw new Error("获取本地IP失败")
     }
 }
 
 async function cacheCtr(ip_addr:string){
     let ret=ip_cache[ip_addr]
     if(!ret || new Date().getTime()/1000-ret['time']>60*60*24*30){
-        // ret=await getLocalIp()
+        ret=await fv()
         ret['time']=new Date().getTime()/1000
         ip_cache[ip_addr]=ret
     }
@@ -109,6 +109,11 @@ const nullInfo:any={
                 "city": "",
                 "area": ""
                 }
+let isUnmounted=false
+let watchLocalIpTask=0
+let getGlobalIpTask=0
+let localLayTask=0
+let globalLayTask=0
 async function watchLocalIp() {
     if(props.isVisible){
         try {
@@ -117,15 +122,15 @@ async function watchLocalIp() {
             let localInfo:any=await cacheCtr(resp['ip'])
             info['localInfo']=localInfo
         } catch (error) {
-            if(error=='获取本地IP失败'){
+            if (error instanceof Error && error.message === '获取本地IP失败') {
                 info['localInfo']=nullInfo
-                return
+            }else{
+                console.log(error)
+                info['localInfo']=null
             }
-            console.log(error)
-            info['localInfo']=null
         }
     }
-    setTimeout(watchLocalIp,info['localInfo']?5000:1000)
+    if(!isUnmounted)watchLocalIpTask=window.setTimeout(watchLocalIp,info['localInfo']?5000:1000)
 }
 async function getGlobalIp() {
     if(props.isVisible){
@@ -142,7 +147,7 @@ async function getGlobalIp() {
             info['globalInfo']=null
         }
     }
-    setTimeout(getGlobalIp,  info['globalInfo']?5000:1000)
+    if(!isUnmounted)getGlobalIpTask=window.setTimeout(getGlobalIp,  info['globalInfo']?5000:1000)
 }
 watchLocalIp()
 getGlobalIp()
@@ -156,10 +161,21 @@ async function get_lay(url:string,type:'localLay'|'globalLay') {
             info[type]=0
         }
     }
-    setTimeout(get_lay, 1000,url,type)
+    if(!isUnmounted){
+        const task=window.setTimeout(get_lay, 1000,url,type)
+        if(type==='localLay')localLayTask=task
+        else globalLayTask=task
+    }
 }
 get_lay('https://connectivitycheck.platform.hicloud.com/generate_204','localLay')
 get_lay('https://cp.cloudflare.com/','globalLay')
+onUnmounted(()=>{
+    isUnmounted=true
+    clearTimeout(watchLocalIpTask)
+    clearTimeout(getGlobalIpTask)
+    clearTimeout(localLayTask)
+    clearTimeout(globalLayTask)
+})
 </script>
 
 <style scoped>

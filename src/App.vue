@@ -221,7 +221,7 @@
 <script lang="ts" setup>
 import MainUI from "./components/Main.vue"
 // import IPinfoUI from "./components/IPinfo.vue"
-import { ref, reactive, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
 // var isAndroid = /Android/i.test(navigator.userAgent)
@@ -252,10 +252,16 @@ let copyText = (txt:string) => {
     message: '已经复制到剪切板',
   })
 }
-document.addEventListener("visibilitychange", function () {
+const onVisibilityChange = () => {
   var string = document.visibilityState
   if (string === 'hidden') isVisible.value = false
   else isVisible.value = true
+}
+onMounted(() => {
+  document.addEventListener("visibilitychange", onVisibilityChange)
+})
+onUnmounted(() => {
+  document.removeEventListener("visibilitychange", onVisibilityChange)
 })
 </script>
 

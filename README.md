@@ -40,3 +40,14 @@ IP 地址查询功能
 4.更友好的界面
 
 5.榜单功能(需要后端支持)
+
+## 本地开发
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+- 项目样式编译依赖 `sass`（dart-sass）。
+- 如使用较新 Node 版本（如 Node 22），请避免使用已废弃的 `node-sass`。

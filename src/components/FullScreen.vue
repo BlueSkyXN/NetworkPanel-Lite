@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref,watch,onMounted, defineModel, watchEffect, onUnmounted} from 'vue'
+import {ref,onMounted, watchEffect, onUnmounted} from 'vue'
 import NoSleep from 'nosleep.js';
 const props=defineProps({
   state: { type: Object, required: true },
@@ -43,13 +43,13 @@ const emit = defineEmits<{
 }>()
 
 const elment=ref()
-document.addEventListener("fullscreenchange", function (e) {
+const handleFullscreenChange = () => {
   if (document.fullscreenElement) {
     emit('update:modelValue', true)
   } else {
     emit('update:modelValue', false)
   }
-})
+}
 const isMiuiBrowser = /MiuiBrowser/i.test(navigator.userAgent)
 let noSleep = isMiuiBrowser?null:new NoSleep();
 watchEffect(
@@ -75,6 +75,7 @@ const date=ref("")
 const dayToWeek = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 let task:number=0
 onMounted(()=>{
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
     task=setInterval(()=>{
         const datetime=new Date()
         time.value=`${datetime.getHours().toString().padStart(2, '0')}:${datetime.getMinutes().toString().padStart(2, '0')}`
@@ -82,6 +83,8 @@ onMounted(()=>{
     },1000)
 })
 onUnmounted(()=>{
+    document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    noSleep?.disable();
     clearInterval(task)
 })
 </script>

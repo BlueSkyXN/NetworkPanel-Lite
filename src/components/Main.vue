@@ -252,7 +252,7 @@ const props = defineProps({
 import { ElMessage } from 'element-plus'
 import nodesJson from "../assets/nodes.json"
 import { Link, Edit, Delete, CircleCheck, Loading, CopyDocument, TrendCharts, Hide, Histogram, Calendar,FullScreen } from '@element-plus/icons-vue'
-import { ref, watch,watchEffect, type Ref, reactive } from 'vue'
+import { ref, watch,watchEffect, type Ref, reactive, onMounted, onUnmounted } from 'vue'
 import { toClipboard } from '@soerenmartius/vue3-clipboard'
 // import MarkUI from './Mark.vue'
 import FullScreenUI from './FullScreen.vue'
@@ -341,8 +341,11 @@ const autoStart = ref(localStorage.autoStart ? localStorage.autoStart === 'true'
 const runUrl = ref(localStorage.url ? localStorage.url : nodes.value[0].options[0].value)
 
 var tasks: Array<number> = []
+let retryTasks: Array<number> = []
+let isUnmounted = false
 
 onMounted(() => {
+  isUnmounted = false
   // setTimeout(() => {
   //   ElMessage.warning({
   //     dangerouslyUseHTMLString: true,
@@ -350,6 +353,7 @@ onMounted(() => {
   //   })
   // },500)
   autoStart.value&&tryStart();
+  window.addEventListener("paste", onPaste)
 })
 
 const tryStart = async () => {
@@ -447,9 +451,11 @@ watch(isRunning, async (newState, oldState) => {
     tasks.push(setInterval(secEvent, 1000))
     runBackground.value ? audioDom.value?.play() : ''
   } else {
-    tasks.map((i) => console.log(i))
-    tasks.map((i) => clearInterval(i))
+    tasks.forEach((i) => console.log(i))
+    tasks.forEach((i) => clearInterval(i))
     tasks = []
+    retryTasks.forEach((i) => clearTimeout(i))
+    retryTasks = []
     // uploadLog()
     audioDom.value?.pause()
     var speed = (state.bytesUsed - state.startUse) / (new Date().getTime() / 1000 - state.startTime)
@@ -535,7 +541,7 @@ const copyUrl = () => {
   })
 }
 
-window.addEventListener("paste", function (e) {
+const onPaste = (e: ClipboardEvent) => {
   if (!(e.clipboardData && e.clipboardData.items && document.activeElement?.nodeName != 'INPUT'))return;
   for (var i = 0, len = e.clipboardData.items.length; i < len; i++) {
     var itemz = e.clipboardData.items[i];
@@ -558,7 +564,7 @@ window.addEventListener("paste", function (e) {
       break
     }
   }
-})
+}
 var setTitle = (speed: number = 0) => {
   if (props.isVisible) {
     document.title = '网络面板'
@@ -573,7 +579,10 @@ var setTitle = (speed: number = 0) => {
   }
 }
 var setUsed = () => {
-  if (!state.bytesUsed) state.show.allUsed = '-'
+  if (!state.bytesUsed) {
+    state.show.allUsed = '-'
+    return
+  }
   state.show.allUsed = formatter(state.bytesUsed, 0, [0, 0, 1, 2, 2, 2])
 }
 var setSpeed = (speed: number) => {
@@ -641,6 +650,7 @@ async function startThread(index: number, retryCount: number = 0) {
   const RETRY_DELAY = Math.min(1000 * Math.pow(2, retryCount), 10000) // Exponential backoff, max 10s
   
   try {
+    if (isUnmounted || !isRunning.value || index >= threadNum.value) return
     if(solvedRunUrl==""){
       isRunning.value=false
       return
@@ -657,12 +667,12 @@ async function startThread(index: number, retryCount: number = 0) {
       while (true) {
         if(state.maxSpeed)await speedCtr()
         const { value } = await reader.read();
+        if (isUnmounted || !isRunning.value || index >= threadNum.value) break
         let chunkLength = value?.length
         if (!chunkLength || solvedRunUrl != _url) {
-          // Fix: Cancel reader before recursive call to prevent resource leak
-          await reader.cancel()
-          startThread(index, 0); // Reset retry count on URL change
-          return; // Use return instead of break to avoid duplicate cancel
+          // Restart thread on URL change or stream end
+          if (!isUnmounted && isRunning.value) startThread(index, 0); // Reset retry count on URL change
+          break
         }
         let usefulChunkLength = chunkLength
         if (decodeLength >= realLength) {
@@ -671,7 +681,7 @@ async function startThread(index: number, retryCount: number = 0) {
           usefulChunkLength = realLength - decodeLength
         }
         state.bytesUsed += usefulChunkLength
-        if (index >= threadNum.value || !isRunning.value) break
+        if (isUnmounted || index >= threadNum.value || !isRunning.value) break
         decodeLength += chunkLength
       }
     } finally {
@@ -681,8 +691,12 @@ async function startThread(index: number, retryCount: number = 0) {
   } catch (err) {
     console.log(err)
     // Fix: Implement exponential backoff and retry limit to prevent infinite recursion
-    if (isRunning.value && retryCount < MAX_RETRIES) {
-      setTimeout(() => startThread(index, retryCount + 1), RETRY_DELAY)
+    if (!isUnmounted && isRunning.value && retryCount < MAX_RETRIES) {
+      const timer = window.setTimeout(() => {
+        retryTasks = retryTasks.filter((id) => id !== timer)
+        startThread(index, retryCount + 1)
+      }, RETRY_DELAY)
+      retryTasks.push(timer)
     } else if (retryCount >= MAX_RETRIES) {
       console.warn(`Thread ${index} exceeded max retries (${MAX_RETRIES})`)
     }
@@ -774,12 +788,10 @@ var isMiuiBrowser = /MiuiBrowser/i.test(navigator.userAgent)
 var isIOS = /iPhone|Macintosh/i.test(navigator.userAgent)
 
 const audioDom: Ref<any> = ref(null);
-
-
-import { onMounted, onUnmounted } from 'vue';
 import * as echarts from 'echarts';
 
 const chartContainer = ref(null);
+const onWindowResize = () => myChart?.resize()
 
 let myChart: EChartsType;
 let updateChart = (n:number) => {};
@@ -847,10 +859,11 @@ onMounted(() => {
   let speedTemp:Array<number>=[]
   let stepLength=1
   clearChart=()=>{
-    // showArray=[]
+    showArray=[[new Date().getTime() / 1000,0]]
     speedTemp=[]
-    showArray.push([new Date().getTime() / 1000,0])
-    // stepLength=1
+    stepLength=1
+    chartOption.series[0].data = showArray
+    if(chartShow.value)myChart.setOption(chartOption)
   }
   updateChart = (speed:number) => {
     let refresh=false
@@ -876,10 +889,17 @@ onMounted(() => {
     chartOption.series[0].data = showArray
     if(chartShow.value && refresh)myChart.setOption(chartOption);
   }
-  window.addEventListener('resize', () => { myChart.resize() });
+  window.addEventListener('resize', onWindowResize);
 });
 
 onUnmounted(() => {
+  isUnmounted = true
+  window.removeEventListener("paste", onPaste)
+  window.removeEventListener('resize', onWindowResize)
+  tasks.forEach((i) => clearInterval(i))
+  retryTasks.forEach((i) => clearTimeout(i))
+  tasks = []
+  retryTasks = []
   if (myChart) {
     myChart.dispose();
   }
